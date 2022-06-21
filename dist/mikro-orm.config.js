@@ -13,7 +13,9 @@ exports.default = {
     },
     entities: [Post_1.Post],
     dbName: "lireddit",
+    password: "Chical1",
     type: "postgresql",
     debug: !constants_1.__prod__,
+    allowGlobalContext: true,
 };
 //# sourceMappingURL=mikro-orm.config.js.map
