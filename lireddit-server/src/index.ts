@@ -1,5 +1,5 @@
 import { MikroORM } from "@mikro-orm/core";
-import { __prod__ } from "./constants";
+import { COOKIE_NAME, __prod__ } from "./constants";
 // import { Post } from "./entities/Post";
 import mikroOrmConfig from "./mikro-orm.config";
 import express from "express";
@@ -27,12 +27,11 @@ const main = async () => {
   // REDIS init
   const redisClient = createClient({ legacyMode: true });
   redisClient.connect().catch(console.error);
-
   app.use(cors({ origin: "http://localhost:3000", credentials: true }));
 
   app.use(
     session({
-      name: "qid",
+      name: COOKIE_NAME,
       store: new RedisStore({ client: redisClient, disableTouch: true }),
       cookie: {
         maxAge: 31536000 * 10, // 10 years
@@ -55,7 +54,10 @@ const main = async () => {
   });
 
   await apolloServer.start();
-  apolloServer.applyMiddleware({ app, cors: false });
+  apolloServer.applyMiddleware({
+    app,
+    cors: false,
+  });
 
   app.listen(4000, () => {
     console.log("Server running on port 4000");

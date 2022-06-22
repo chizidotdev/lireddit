@@ -24,7 +24,7 @@ const main = async () => {
     redisClient.connect().catch(console.error);
     app.use((0, cors_1.default)({ origin: "http://localhost:3000", credentials: true }));
     app.use((0, express_session_1.default)({
-        name: "qid",
+        name: constants_1.COOKIE_NAME,
         store: new RedisStore({ client: redisClient, disableTouch: true }),
         cookie: {
             maxAge: 31536000 * 10,
@@ -44,7 +44,10 @@ const main = async () => {
         context: ({ req, res }) => ({ em: orm.em, req, res }),
     });
     await apolloServer.start();
-    apolloServer.applyMiddleware({ app, cors: false });
+    apolloServer.applyMiddleware({
+        app,
+        cors: false,
+    });
     app.listen(4000, () => {
         console.log("Server running on port 4000");
     });

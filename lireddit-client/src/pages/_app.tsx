@@ -6,6 +6,7 @@ import theme from "../theme";
 import { AppProps } from "next/app";
 import {
   LoginMutation,
+  LogoutMutation,
   MeDocument,
   MeQuery,
   RegisterMutation,
@@ -29,6 +30,17 @@ const client = createClient({
     cacheExchange({
       updates: {
         Mutation: {
+          //Cache Refresh on Logout
+          logout: (_result, args, cache, info) => {
+            betterUpdateQuery<LogoutMutation, MeQuery>(
+              cache,
+              { query: MeDocument },
+              _result,
+              () => ({ me: null })
+            );
+          },
+
+          //Cache Refresh on Login
           login: (_result, args, cache, info) => {
             betterUpdateQuery<LoginMutation, MeQuery>(
               cache,
@@ -45,6 +57,8 @@ const client = createClient({
               }
             );
           },
+
+          //Cache Refresh on Register
           register: (_result, args, cache, info) => {
             betterUpdateQuery<RegisterMutation, MeQuery>(
               cache,
