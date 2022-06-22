@@ -3,6 +3,8 @@ import { __prod__ } from "./constants";
 // import { Post } from "./entities/Post";
 import mikroOrmConfig from "./mikro-orm.config";
 import express from "express";
+import cors from "cors";
+
 import { ApolloServer } from "apollo-server-express";
 import { buildSchema } from "type-graphql";
 import { UserResolver } from "./resolvers/user";
@@ -25,6 +27,8 @@ const main = async () => {
   // REDIS init
   const redisClient = createClient({ legacyMode: true });
   redisClient.connect().catch(console.error);
+
+  app.use(cors({ origin: "http://localhost:3000", credentials: true }));
 
   app.use(
     session({
@@ -51,7 +55,7 @@ const main = async () => {
   });
 
   await apolloServer.start();
-  apolloServer.applyMiddleware({ app });
+  apolloServer.applyMiddleware({ app, cors: false });
 
   app.listen(4000, () => {
     console.log("Server running on port 4000");
