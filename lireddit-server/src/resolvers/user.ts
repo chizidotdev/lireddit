@@ -36,6 +36,60 @@ class UserResponse {
 
 @Resolver()
 export class UserResolver {
+  @Mutation(() => UserResponse)
+  async changePassword(
+    @Arg("token") token: string,
+    @Arg("newPassword") newPassword: string,
+    @Ctx() { redis, em, req }: MyContext
+  ): Promise<UserResponse> {
+    if (newPassword.length <= 4) {
+      return {
+        errors: [
+          {
+            field: "newPassword",
+            message: "Password must be greater than 4 characters",
+          },
+        ],
+      };
+    }
+
+    const key = FORGET_PASSWORD_PREFIX + token;
+    const userId = await redis.get(key);
+    if (!userId) {
+      return {
+        errors: [
+          {
+            field: "token",
+            message: "token expired",
+          },
+        ],
+      };
+    }
+
+    const user = await em.findOne(User, { id: parseInt(userId) });
+
+    if (!user) {
+      return {
+        errors: [
+          {
+            field: "token",
+            message: "user does not exist",
+          },
+        ],
+      };
+    }
+
+    user.password = await argon2.hash(newPassword);
+    em.persistAndFlush(user);
+
+    await redis.del(key);
+
+    //log in user after password change
+    req.session!.userId = user.id;
+
+    return { user };
+  }
+
   @Mutation(() => Boolean)
   async forgotPassword(
     @Arg("email") email: string,
@@ -53,6 +107,9 @@ export class UserResolver {
       "EX",
       86400 // 24hours
     );
+
+    console.log("===========token is: =============", token);
+
     await sendEmail(
       email,
       `<a href='http://localhost:3000/change-password/${token}'>Reset Password</a>`
