@@ -1,7 +1,5 @@
-import { MikroORM } from "@mikro-orm/core";
+import "reflect-metadata";
 import { COOKIE_NAME, __prod__ } from "./constants";
-// import { Post } from "./entities/Post";
-import mikroOrmConfig from "./mikro-orm.config";
 import express from "express";
 import cors from "cors";
 
@@ -14,15 +12,19 @@ import session from "express-session";
 import Redis from "ioredis";
 import connectRedis from "connect-redis";
 import { MyContext } from "./types";
+import { conn } from "./app-data-source";
 
 let RedisStore = connectRedis(session);
 
 const main = async () => {
-  // Connect to Database and run Migrations
-  const orm = await MikroORM.init(mikroOrmConfig);
-
-  // await orm.em.nativeDelete(User, {});
-  await orm.getMigrator().up();
+  conn
+    .initialize()
+    .then(() => {
+      console.log("Data Source has been initialized!");
+    })
+    .catch((err) => {
+      console.error("Error during Data Source initialization", err);
+    });
 
   const app = express();
 
@@ -57,7 +59,7 @@ const main = async () => {
       resolvers: [UserResolver, PostResolver],
       validate: false,
     }),
-    context: ({ req, res }): MyContext => ({ em: orm.em, req, res, redis }),
+    context: ({ req, res }): MyContext => ({ req, res, redis }),
   });
 
   await apolloServer.start();
