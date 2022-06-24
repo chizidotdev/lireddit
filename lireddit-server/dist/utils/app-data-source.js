@@ -12,7 +12,7 @@ exports.conn = new typeorm_1.DataSource({
     username: "postgres",
     password: "Chical1",
     logging: true,
-    synchronize: false,
+    synchronize: true,
     entities: [Post_1.Post, User_1.User],
 });
 //# sourceMappingURL=app-data-source.js.map

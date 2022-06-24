@@ -10,6 +10,6 @@ export const conn = new DataSource({
   username: "postgres",
   password: "Chical1",
   logging: true,
-  synchronize: false,
+  synchronize: true,
   entities: [Post, User],
 });
