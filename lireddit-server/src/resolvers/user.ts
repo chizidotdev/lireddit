@@ -16,7 +16,7 @@ import { validateRegister } from "../utils/validateRegister";
 import { sendEmail } from "../utils/sendEmail";
 import { v4 } from "uuid";
 import { FindOneOptions } from "typeorm";
-// import { conn } from "../app-data-source";
+// import { conn } from "../utils/app-data-source";
 
 @ObjectType()
 class FieldError {

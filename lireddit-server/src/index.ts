@@ -12,7 +12,7 @@ import session from "express-session";
 import Redis from "ioredis";
 import connectRedis from "connect-redis";
 import { MyContext } from "./types";
-import { conn } from "./app-data-source";
+import { conn } from "./utils/app-data-source";
 
 let RedisStore = connectRedis(session);
 
@@ -25,6 +25,8 @@ const main = async () => {
     .catch((err) => {
       console.error("Error during Data Source initialization", err);
     });
+
+  // await Post.delete({});
 
   const app = express();
 

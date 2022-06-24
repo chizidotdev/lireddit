@@ -14,7 +14,7 @@ const post_1 = require("./resolvers/post");
 const express_session_1 = __importDefault(require("express-session"));
 const ioredis_1 = __importDefault(require("ioredis"));
 const connect_redis_1 = __importDefault(require("connect-redis"));
-const app_data_source_1 = require("./app-data-source");
+const app_data_source_1 = require("./utils/app-data-source");
 let RedisStore = (0, connect_redis_1.default)(express_session_1.default);
 const main = async () => {
     app_data_source_1.conn

@@ -1,6 +1,6 @@
 import { DataSource } from "typeorm";
-import { Post } from "./entities/Post";
-import { User } from "./entities/User";
+import { Post } from "../entities/Post";
+import { User } from "../entities/User";
 
 export const conn = new DataSource({
   type: "postgres",
@@ -10,6 +10,6 @@ export const conn = new DataSource({
   username: "postgres",
   password: "Chical1",
   logging: true,
-  synchronize: true,
+  synchronize: false,
   entities: [Post, User],
 });
