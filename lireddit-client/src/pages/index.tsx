@@ -7,13 +7,13 @@ const Index = () => {
   const [{ data }] = usePostsQuery();
 
   return (
-    <div>
+    <>
       <Navbar />
 
       <h1>Hello World</h1>
       <br />
       {data ? data.posts.map((p) => <div key={p.id}>{p.title}</div>) : null}
-    </div>
+    </>
   );
 };
 

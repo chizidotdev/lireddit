@@ -11,7 +11,7 @@ import { UserResolver } from "./resolvers/user";
 import { PostResolver } from "./resolvers/post";
 
 import session from "express-session";
-const { createClient } = require("redis");
+import Redis from "ioredis";
 import connectRedis from "connect-redis";
 import { MyContext } from "./types";
 
@@ -20,19 +20,26 @@ let RedisStore = connectRedis(session);
 const main = async () => {
   // Connect to Database and run Migrations
   const orm = await MikroORM.init(mikroOrmConfig);
+
+  // await orm.em.nativeDelete(User, {});
   await orm.getMigrator().up();
 
   const app = express();
 
   // REDIS init
-  const redisClient = createClient({ legacyMode: true });
-  redisClient.connect().catch(console.error);
-  app.use(cors({ origin: "http://localhost:3000", credentials: true }));
+  const redis = Redis.createClient();
+  // redis.connect().catch(console.error);
+  app.use(
+    cors({
+      origin: ["https://studio.apollographql.com", "http://localhost:3000"],
+      credentials: true,
+    })
+  );
 
   app.use(
     session({
       name: COOKIE_NAME,
-      store: new RedisStore({ client: redisClient, disableTouch: true }),
+      store: new RedisStore({ client: redis, disableTouch: true }),
       cookie: {
         maxAge: 31536000 * 10, // 10 years
         httpOnly: true,
@@ -50,7 +57,7 @@ const main = async () => {
       resolvers: [UserResolver, PostResolver],
       validate: false,
     }),
-    context: ({ req, res }): MyContext => ({ em: orm.em, req, res }),
+    context: ({ req, res }): MyContext => ({ em: orm.em, req, res, redis }),
   });
 
   await apolloServer.start();
