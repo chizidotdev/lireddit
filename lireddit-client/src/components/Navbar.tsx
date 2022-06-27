@@ -14,7 +14,9 @@ const Navbar: React.FC<NavbarProps> = ({}) => {
 
   let body = null;
 
-  if (!fetching && !data?.me) {
+  if (fetching) {
+    body = null;
+  } else if (!data?.me) {
     body = (
       <>
         <Link href="/login">Login</Link>

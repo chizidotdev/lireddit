@@ -9,7 +9,7 @@ import { UserResolver } from "./resolvers/user";
 import { PostResolver } from "./resolvers/post";
 
 import session from "express-session";
-import Redis from "ioredis";
+const Redis = require("ioredis");
 import connectRedis from "connect-redis";
 import { MyContext } from "./types";
 import { conn } from "./utils/app-data-source";
@@ -31,7 +31,7 @@ const main = async () => {
   const app = express();
 
   // REDIS init
-  const redis = Redis.createClient();
+  const redis = new Redis();
   // redis.connect().catch(console.error);
   app.use(
     cors({

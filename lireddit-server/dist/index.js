@@ -12,7 +12,7 @@ const type_graphql_1 = require("type-graphql");
 const user_1 = require("./resolvers/user");
 const post_1 = require("./resolvers/post");
 const express_session_1 = __importDefault(require("express-session"));
-const ioredis_1 = __importDefault(require("ioredis"));
+const Redis = require("ioredis");
 const connect_redis_1 = __importDefault(require("connect-redis"));
 const app_data_source_1 = require("./utils/app-data-source");
 let RedisStore = (0, connect_redis_1.default)(express_session_1.default);
@@ -26,7 +26,7 @@ const main = async () => {
         console.error("Error during Data Source initialization", err);
     });
     const app = (0, express_1.default)();
-    const redis = ioredis_1.default.createClient();
+    const redis = new Redis();
     app.use((0, cors_1.default)({
         origin: ["https://studio.apollographql.com", "http://localhost:3000"],
         credentials: true,

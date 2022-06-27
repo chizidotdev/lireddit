@@ -106,7 +106,7 @@ let UserResolver = class UserResolver {
         if (!req.session.userId) {
             return null;
         }
-        const user = await User_1.User.findOne(req.session.userId);
+        const user = await User_1.User.findOne({ where: { id: req.session.userId } });
         return user;
     }
     async register(options, { req }) {
