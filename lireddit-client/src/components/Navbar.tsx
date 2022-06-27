@@ -6,7 +6,7 @@ import { isServer } from "../utils/isServer";
 
 interface NavbarProps {}
 
-export const Navbar: React.FC<NavbarProps> = ({}) => {
+const Navbar: React.FC<NavbarProps> = ({}) => {
   const [{ fetching: logoutFetching }, logout] = useLogoutMutation();
   const [{ data, fetching }] = useMeQuery({
     pause: isServer(),
@@ -14,8 +14,7 @@ export const Navbar: React.FC<NavbarProps> = ({}) => {
 
   let body = null;
 
-  if (fetching) {
-  } else if (!data?.me) {
+  if (!fetching && !data?.me) {
     body = (
       <>
         <Link href="/login">Login</Link>
@@ -25,7 +24,7 @@ export const Navbar: React.FC<NavbarProps> = ({}) => {
   } else {
     body = (
       <Flex gap={10}>
-        <Box>Hello, &nbsp;{data.me.username}</Box>
+        <Box>Hello, &nbsp;{data?.me?.username}</Box>
         <Button
           onClick={() => logout()}
           isLoading={logoutFetching}
@@ -38,10 +37,21 @@ export const Navbar: React.FC<NavbarProps> = ({}) => {
   }
 
   return (
-    <Flex bg="blue.900" p={4} px={100}>
-      <Flex ml="auto" gap={10} color="white">
+    <Flex
+      zIndex={10}
+      position="sticky"
+      top={0}
+      bg="blue.900"
+      p={4}
+      px={100}
+      color="white"
+    >
+      <Link href="/">Lireddit</Link>
+      <Flex ml="auto" gap={10}>
         {body}
       </Flex>
     </Flex>
   );
 };
+
+export default Navbar;

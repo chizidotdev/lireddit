@@ -102,11 +102,12 @@ let UserResolver = class UserResolver {
         await (0, sendEmail_1.sendEmail)(email, `<a href='http://localhost:3000/change-password/${token}'>Reset Password</a>`);
         return true;
     }
-    me({ req }) {
+    async me({ req }) {
         if (!req.session.userId) {
             return null;
         }
-        return User_1.User.findOne(req.session.userId);
+        const user = await User_1.User.findOne(req.session.userId);
+        return user;
     }
     async register(options, { req }) {
         const errors = (0, validateRegister_1.validateRegister)(options);
@@ -123,7 +124,6 @@ let UserResolver = class UserResolver {
             }).save();
         }
         catch (err) {
-            console.log("==========register user error===========", err);
             if (err.code === "23505") {
                 return {
                     errors: [{ field: "username", message: "username already exists" }],
@@ -203,7 +203,7 @@ __decorate([
     __param(0, (0, type_graphql_1.Ctx)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Object]),
-    __metadata("design:returntype", void 0)
+    __metadata("design:returntype", Promise)
 ], UserResolver.prototype, "me", null);
 __decorate([
     (0, type_graphql_1.Mutation)(() => UserResponse),

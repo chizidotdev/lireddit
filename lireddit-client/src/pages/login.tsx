@@ -4,7 +4,7 @@ import { withUrqlClient } from "next-urql";
 import { useRouter } from "next/router";
 import React from "react";
 import { InputField } from "../components/InputField";
-import { Navbar } from "../components/Navbar";
+import Navbar from "../components/Navbar";
 import { Wrapper } from "../components/Wrapper";
 import { useLoginMutation } from "../generated/graphql";
 import { createUrqlClient } from "../utils/createUrqlClient";
@@ -17,6 +17,8 @@ export const Login: React.FC<RegisterProps> = ({}) => {
   const router = useRouter();
   const [, login] = useLoginMutation();
 
+  console.log(router);
+
   return (
     <>
       <Navbar />
@@ -28,7 +30,11 @@ export const Login: React.FC<RegisterProps> = ({}) => {
             if (response.data?.login.errors) {
               setErrors(toErrorMap(response.data.login.errors));
             } else if (response.data?.login.user) {
-              router.push("/");
+              if (typeof router.query.next === "string") {
+                router.push(router.query.next);
+              } else {
+                router.push("/");
+              }
             }
           }}
         >

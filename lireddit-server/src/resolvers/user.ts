@@ -127,12 +127,13 @@ export class UserResolver {
   }
 
   @Query(() => User, { nullable: true })
-  me(@Ctx() { req }: MyContext) {
+  async me(@Ctx() { req }: MyContext) {
     if (!req.session!.userId) {
       return null;
     }
+    const user = await User.findOne(req.session!.userId);
 
-    return User.findOne(req.session!.userId);
+    return user;
   }
 
   // Register User
@@ -168,8 +169,6 @@ export class UserResolver {
       //   .returning("*")
       //   .execute();
     } catch (err) {
-      console.log("==========register user error===========", err);
-
       if (err.code === "23505") {
         return {
           errors: [{ field: "username", message: "username already exists" }],

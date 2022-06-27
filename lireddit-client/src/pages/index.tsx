@@ -1,17 +1,19 @@
-import { Box } from "@chakra-ui/react";
+import { Box, Button } from "@chakra-ui/react";
 import { withUrqlClient } from "next-urql";
-import { Navbar } from "../components/Navbar";
 import { usePostsQuery } from "../generated/graphql";
 import { createUrqlClient } from "../utils/createUrqlClient";
+import { useMeQuery } from "../generated/graphql";
+import { Layout } from "../components/Layout";
+import Link from "next/link";
 
 const Index = () => {
   const [{ data }] = usePostsQuery();
 
   return (
-    <>
-      <Navbar />
-
-      <h1>Hello World</h1>
+    <Layout>
+      <Button variant="link">
+        <Link href="/create-post">Create Post</Link>
+      </Button>
       <br />
       {data
         ? data.posts.map((p) => (
@@ -21,7 +23,7 @@ const Index = () => {
             </Box>
           ))
         : null}
-    </>
+    </Layout>
   );
 };
 
