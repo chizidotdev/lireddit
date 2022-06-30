@@ -14,10 +14,10 @@ const post_1 = require("./resolvers/post");
 const express_session_1 = __importDefault(require("express-session"));
 const Redis = require("ioredis");
 const connect_redis_1 = __importDefault(require("connect-redis"));
-const app_data_source_1 = require("./utils/app-data-source");
+const app_data_source_1 = __importDefault(require("./utils/app-data-source"));
 let RedisStore = (0, connect_redis_1.default)(express_session_1.default);
 const main = async () => {
-    app_data_source_1.conn
+    await app_data_source_1.default
         .initialize()
         .then(() => {
         console.log("Data Source has been initialized!");
@@ -25,6 +25,7 @@ const main = async () => {
         .catch((err) => {
         console.error("Error during Data Source initialization", err);
     });
+    await app_data_source_1.default.runMigrations();
     const app = (0, express_1.default)();
     const redis = new Redis();
     app.use((0, cors_1.default)({

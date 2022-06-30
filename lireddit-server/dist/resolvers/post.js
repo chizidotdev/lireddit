@@ -11,11 +11,15 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var __param = (this && this.__param) || function (paramIndex, decorator) {
     return function (target, key) { decorator(target, key, paramIndex); }
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.PostResolver = void 0;
 const Post_1 = require("../entities/Post");
 const type_graphql_1 = require("type-graphql");
 const isAuth_1 = require("../middleware/isAuth");
+const app_data_source_1 = __importDefault(require("../utils/app-data-source"));
 let PostInput = class PostInput {
 };
 __decorate([
@@ -30,8 +34,25 @@ PostInput = __decorate([
     (0, type_graphql_1.InputType)()
 ], PostInput);
 let PostResolver = class PostResolver {
-    posts() {
-        return Post_1.Post.find();
+    async posts(limit, cursor) {
+        const realLimit = Math.min(50, limit);
+        let posts;
+        posts = await app_data_source_1.default
+            .getRepository(Post_1.Post)
+            .createQueryBuilder("p")
+            .orderBy('"createdAt"', "DESC")
+            .take(realLimit)
+            .getMany();
+        if (cursor) {
+            posts = await app_data_source_1.default
+                .getRepository(Post_1.Post)
+                .createQueryBuilder("p")
+                .where('"createdAt" > :cursor', { cursor: new Date(parseInt(cursor)) })
+                .orderBy('"createdAt"', "DESC")
+                .take(realLimit)
+                .getMany();
+        }
+        return posts;
     }
     post(id) {
         return Post_1.Post.findOne(id);
@@ -56,8 +77,10 @@ let PostResolver = class PostResolver {
 };
 __decorate([
     (0, type_graphql_1.Query)(() => [Post_1.Post]),
+    __param(0, (0, type_graphql_1.Arg)("limit", () => type_graphql_1.Int)),
+    __param(1, (0, type_graphql_1.Arg)("cursor", () => String, { nullable: true })),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", []),
+    __metadata("design:paramtypes", [Number, Object]),
     __metadata("design:returntype", Promise)
 ], PostResolver.prototype, "posts", null);
 __decorate([

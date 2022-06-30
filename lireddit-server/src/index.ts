@@ -12,12 +12,13 @@ import session from "express-session";
 const Redis = require("ioredis");
 import connectRedis from "connect-redis";
 import { MyContext } from "./types";
-import { conn } from "./utils/app-data-source";
+import conn from "./utils/app-data-source";
+// import { Post } from "./entities/Post";
 
 let RedisStore = connectRedis(session);
 
 const main = async () => {
-  conn
+  await conn
     .initialize()
     .then(() => {
       console.log("Data Source has been initialized!");
@@ -25,6 +26,8 @@ const main = async () => {
     .catch((err) => {
       console.error("Error during Data Source initialization", err);
     });
+
+  await conn.runMigrations();
 
   // await Post.delete({});
 

@@ -2,7 +2,7 @@ import { DataSource } from "typeorm";
 import { Post } from "../entities/Post";
 import { User } from "../entities/User";
 
-export const conn = new DataSource({
+const conn = new DataSource({
   type: "postgres",
   host: "localhost",
   port: 5432,
@@ -11,5 +11,8 @@ export const conn = new DataSource({
   password: "Chical1",
   logging: true,
   synchronize: true,
+  migrations: [`${__dirname}/migrations/**/*{.ts,.js}`],
   entities: [Post, User],
 });
+
+export default conn;

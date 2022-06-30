@@ -4,6 +4,7 @@ import {
   Ctx,
   Field,
   InputType,
+  Int,
   Mutation,
   Query,
   Resolver,
@@ -12,6 +13,7 @@ import {
 import { FindOneOptions } from "typeorm";
 import { MyContext } from "../types";
 import { isAuth } from "../middleware/isAuth";
+import conn from "../utils/app-data-source";
 
 @InputType()
 class PostInput {
@@ -24,8 +26,32 @@ class PostInput {
 @Resolver()
 export class PostResolver {
   @Query(() => [Post])
-  posts(): Promise<Post[]> {
-    return Post.find();
+  async posts(
+    @Arg("limit", () => Int) limit: number,
+    @Arg("cursor", () => String, { nullable: true }) cursor: string | null
+  ): Promise<Post[]> {
+    const realLimit = Math.min(50, limit);
+
+    let posts;
+
+    posts = await conn
+      .getRepository(Post)
+      .createQueryBuilder("p")
+      .orderBy('"createdAt"', "DESC")
+      .take(realLimit)
+      .getMany();
+
+    if (cursor) {
+      posts = await conn
+        .getRepository(Post)
+        .createQueryBuilder("p")
+        .where('"createdAt" > :cursor', { cursor: new Date(parseInt(cursor)) })
+        .orderBy('"createdAt"', "DESC")
+        .take(realLimit)
+        .getMany();
+    }
+
+    return posts;
   }
 
   @Query(() => Post, { nullable: true })
