@@ -11,7 +11,7 @@ import { useChangePasswordMutation } from "../../generated/graphql";
 import { createUrqlClient } from "../../utils/createUrqlClient";
 import { toErrorMap } from "../../utils/toErrorMap";
 
-const ChangePassword: NextPage = () => {
+const ChangePassword: NextPage<{ token: string }> = () => {
   const [tokenError, setTokenError] = useState("");
   const [, changePassword] = useChangePasswordMutation();
 
