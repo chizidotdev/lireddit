@@ -34,18 +34,18 @@ export class PostResolver {
 
     let posts;
 
-    posts = await conn
-      .getRepository(Post)
-      .createQueryBuilder("p")
-      .orderBy('"createdAt"', "DESC")
-      .take(realLimit)
-      .getMany();
-
     if (cursor) {
       posts = await conn
         .getRepository(Post)
         .createQueryBuilder("p")
         .where('"createdAt" > :cursor', { cursor: new Date(parseInt(cursor)) })
+        .orderBy('"createdAt"', "DESC")
+        .take(realLimit)
+        .getMany();
+    } else {
+      posts = await conn
+        .getRepository(Post)
+        .createQueryBuilder("p")
         .orderBy('"createdAt"', "DESC")
         .take(realLimit)
         .getMany();

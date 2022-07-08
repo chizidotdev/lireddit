@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.FakePosts1656458442784 = void 0;
-class FakePosts1656458442784 {
+exports.FakerPosts1656458442784 = void 0;
+class FakerPosts1656458442784 {
     async up(queryRunner) {
         await queryRunner.query(`insert into post (title, text, "creatorId") values ('Stranger Than Paradise', 'Curabitur in libero ut massa volutpat convallis. Morbi odio odio, elementum eu, interdum eu, tincidunt in, leo. Maecenas pulvinar lobortis est.
 
@@ -310,7 +310,7 @@ class FakePosts1656458442784 {
         
         Proin interdum mauris non ligula pellentesque ultrices. Phasellus id sapien in sapien iaculis congue. Vivamus metus arcu, adipiscing molestie, hendrerit at, vulputate vitae, nisl.', 1);`);
     }
-    async down(queryRunner) { }
+    async down(_) { }
 }
-exports.FakePosts1656458442784 = FakePosts1656458442784;
+exports.FakerPosts1656458442784 = FakerPosts1656458442784;
 //# sourceMappingURL=1656557016993-FakePosts.js.map

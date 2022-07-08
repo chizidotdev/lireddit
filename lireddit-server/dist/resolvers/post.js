@@ -37,17 +37,19 @@ let PostResolver = class PostResolver {
     async posts(limit, cursor) {
         const realLimit = Math.min(50, limit);
         let posts;
-        posts = await app_data_source_1.default
-            .getRepository(Post_1.Post)
-            .createQueryBuilder("p")
-            .orderBy('"createdAt"', "DESC")
-            .take(realLimit)
-            .getMany();
         if (cursor) {
             posts = await app_data_source_1.default
                 .getRepository(Post_1.Post)
                 .createQueryBuilder("p")
                 .where('"createdAt" > :cursor', { cursor: new Date(parseInt(cursor)) })
+                .orderBy('"createdAt"', "DESC")
+                .take(realLimit)
+                .getMany();
+        }
+        else {
+            posts = await app_data_source_1.default
+                .getRepository(Post_1.Post)
+                .createQueryBuilder("p")
                 .orderBy('"createdAt"', "DESC")
                 .take(realLimit)
                 .getMany();
