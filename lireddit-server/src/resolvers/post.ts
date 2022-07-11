@@ -3,11 +3,14 @@ import {
   Arg,
   Ctx,
   Field,
+  FieldResolver,
   InputType,
   Int,
   Mutation,
+  ObjectType,
   Query,
   Resolver,
+  Root,
   UseMiddleware,
 } from "type-graphql";
 import { FindOneOptions } from "typeorm";
@@ -23,14 +26,28 @@ class PostInput {
   text: string;
 }
 
-@Resolver()
+@ObjectType()
+class PaginatedPosts {
+  @Field(() => [Post])
+  posts: Post[];
+  @Field()
+  hasMore: boolean;
+}
+
+@Resolver(Post)
 export class PostResolver {
-  @Query(() => [Post])
+  @FieldResolver(() => String)
+  textSnippet(@Root() root: Post) {
+    return root.text.slice(0, 100);
+  }
+
+  @Query(() => PaginatedPosts)
   async posts(
     @Arg("limit", () => Int) limit: number,
     @Arg("cursor", () => String, { nullable: true }) cursor: string | null
-  ): Promise<Post[]> {
-    const realLimit = Math.min(50, limit);
+  ): Promise<PaginatedPosts> {
+    const realLimit = Math.min(50, limit) + 1;
+    const realLimitPlusOne = Math.min(50, limit) + 1;
 
     let posts;
 
@@ -38,9 +55,9 @@ export class PostResolver {
       posts = await conn
         .getRepository(Post)
         .createQueryBuilder("p")
-        .where('"createdAt" > :cursor', { cursor: new Date(parseInt(cursor)) })
+        .where('"createdAt" < :cursor', { cursor: new Date(parseInt(cursor)) })
         .orderBy('"createdAt"', "DESC")
-        .take(realLimit)
+        .take(realLimitPlusOne)
         .getMany();
     } else {
       posts = await conn
@@ -51,7 +68,10 @@ export class PostResolver {
         .getMany();
     }
 
-    return posts;
+    return {
+      posts: posts.slice(0, realLimit),
+      hasMore: posts.length === realLimitPlusOne,
+    };
   }
 
   @Query(() => Post, { nullable: true })

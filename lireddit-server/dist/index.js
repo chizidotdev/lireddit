@@ -25,7 +25,6 @@ const main = async () => {
         .catch((err) => {
         console.error("Error during Data Source initialization", err);
     });
-    await app_data_source_1.default.runMigrations();
     const app = (0, express_1.default)();
     const redis = new Redis();
     app.use((0, cors_1.default)({

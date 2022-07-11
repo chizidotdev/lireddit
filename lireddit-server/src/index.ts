@@ -27,8 +27,6 @@ const main = async () => {
       console.error("Error during Data Source initialization", err);
     });
 
-  await conn.runMigrations();
-
   // await Post.delete({});
 
   const app = express();
