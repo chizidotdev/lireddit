@@ -17,6 +17,7 @@ import { FindOneOptions } from "typeorm";
 import { MyContext } from "../types";
 import { isAuth } from "../middleware/isAuth";
 import conn from "../utils/app-data-source";
+import { Updoot } from "../entities/Updoot";
 
 @InputType()
 class PostInput {
@@ -38,7 +39,45 @@ class PaginatedPosts {
 export class PostResolver {
   @FieldResolver(() => String)
   textSnippet(@Root() root: Post) {
-    return root.text.slice(0, 100);
+    if (root.text.length > 99) {
+      return root.text.slice(0, 100) + "...";
+    } else {
+      return root.text;
+    }
+  }
+
+  @Mutation(() => Boolean)
+  @UseMiddleware(isAuth)
+  async vote(
+    @Arg("postId", () => Int) postId: number,
+    @Arg("value", () => Int) value: number,
+    @Ctx() { req }: MyContext
+  ) {
+    const isUpdoot = value !== -1;
+    const realValue = isUpdoot ? 1 : -1;
+
+    const { userId } = req.session;
+    await Updoot.insert({
+      userId,
+      postId,
+      value: realValue,
+    });
+    await conn.query(
+      `
+        START TRANSACTION;
+
+        INSERT INTO updoot ("userId", "postId", value)
+        values (${userId}, ${postId}, ${realValue});
+
+        UPDATE post
+        SET points = points + ${realValue}
+        WHERE id = ${postId};
+
+        COMMIT; 
+      `
+    );
+
+    return true;
   }
 
   @Query(() => PaginatedPosts)
@@ -71,7 +110,7 @@ export class PostResolver {
       replacements
     );
 
-    console.log("posts: ", posts);
+    // console.log("posts: ", posts);
 
     // if (cursor) {
     //   posts = await conn

@@ -1,4 +1,12 @@
-import { Box, Button, Flex, Heading, Stack, Text } from "@chakra-ui/react";
+import {
+  Box,
+  Button,
+  Flex,
+  Heading,
+  IconButton,
+  Stack,
+  Text,
+} from "@chakra-ui/react";
 import { withUrqlClient } from "next-urql";
 import { usePostsQuery } from "../generated/graphql";
 import { createUrqlClient } from "../utils/createUrqlClient";
@@ -6,10 +14,12 @@ import { useMeQuery } from "../generated/graphql";
 import { Layout } from "../components/Layout";
 import Link from "next/link";
 import { useState } from "react";
+import { ChevronDownIcon, ChevronUpIcon } from "@chakra-ui/icons";
+import { UpdootSection } from "../components/UpdootSection";
 
 const Index = () => {
   const [variables, setVariables] = useState({
-    limit: 33,
+    limit: 15,
     cursor: null as null | string,
   });
   const [{ data, fetching }] = usePostsQuery({
@@ -29,11 +39,15 @@ const Index = () => {
       {data && !fetching ? (
         <Stack>
           {data.posts.posts.map((p, idx) => (
-            <Box key={idx} p={5} shadow="md" borderWidth="1px">
-              <Heading fontSize="xl">{p.title}</Heading>
-              <Text mt={4}>{p.textSnippet}...</Text>
+            <Flex key={idx} p={5} shadow="md" borderWidth="1px">
+              <UpdootSection post={p} />
+              <Box>
+                <Heading fontSize="xl">{p.title}</Heading>
+                <Text mt={4}>posted by: {p.creator.username}</Text>
+                <Text mt={4}>{p.textSnippet}</Text>
+              </Box>
               {/* <Text mt={4}>{p.text.slice(0, 100)}...</Text> */}
-            </Box>
+            </Flex>
           ))}
         </Stack>
       ) : (

@@ -1,3 +1,4 @@
+import { Updoot } from "../entities/Updoot";
 import { DataSource } from "typeorm";
 import { Post } from "../entities/Post";
 import { User } from "../entities/User";
@@ -12,7 +13,7 @@ const conn = new DataSource({
   logging: true,
   synchronize: true,
   migrations: [`${__dirname}/migrations/**/*{.ts,.js}`],
-  entities: [Post, User],
+  entities: [Post, User, Updoot],
 });
 
 export default conn;
