@@ -60,23 +60,34 @@ let PostResolver = class PostResolver {
         const isUpdoot = value !== -1;
         const realValue = isUpdoot ? 1 : -1;
         const { userId } = req.session;
-        await Updoot_1.Updoot.insert({
-            userId,
-            postId,
-            value: realValue,
-        });
-        await app_data_source_1.default.query(`
-        START TRANSACTION;
-
-        INSERT INTO updoot ("userId", "postId", value)
-        values (${userId}, ${postId}, ${realValue});
-
-        UPDATE post
-        SET points = points + ${realValue}
-        WHERE id = ${postId};
-
-        COMMIT; 
-      `);
+        const updoot = await Updoot_1.Updoot.findOne({ where: { postId, userId } });
+        if (updoot && updoot.value !== realValue) {
+            await app_data_source_1.default.transaction(async (tm) => {
+                await tm.query(`
+          UPDATE updoot
+          SET value = $1
+          WHERE "postId" = $2 and "userId" = $3
+        `, [realValue, postId, userId]);
+                await tm.query(`
+          UPDATE post
+          SET points = points + $1
+          WHERE id = $2
+        `, [2 * realValue, postId]);
+            });
+        }
+        else if (!updoot) {
+            await app_data_source_1.default.transaction(async (tm) => {
+                await tm.query(`
+          INSERT INTO updoot ("userId", "postId", value)
+          values ($1, $2, $3)
+        `, [userId, postId, realValue]);
+                await tm.query(`
+          UPDATE post
+          SET points = points + $1
+          WHERE id = $2
+        `, [realValue, postId]);
+            });
+        }
         return true;
     }
     async posts(limit, cursor) {
