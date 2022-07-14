@@ -122,15 +122,25 @@ export class PostResolver {
   @Query(() => PaginatedPosts)
   async posts(
     @Arg("limit", () => Int) limit: number,
-    @Arg("cursor", () => String, { nullable: true }) cursor: string | null
+    @Arg("cursor", () => String, { nullable: true }) cursor: string | null,
+    @Ctx() { req }: MyContext
   ): Promise<PaginatedPosts> {
     const realLimit = Math.min(50, limit) + 1;
     const realLimitPlusOne = Math.min(50, limit) + 1;
 
     const replacements: any[] = [realLimitPlusOne];
+    if (req.session.userId) {
+      replacements.push(req.session.userId);
+    }
+
+    let cursorIdx = 3;
     if (cursor) {
       replacements.push(new Date(parseInt(cursor)));
+      cursorIdx = replacements.length;
     }
+
+    console.log("session status", req.session);
+    // console.log("", req);
 
     const posts = await conn.query(
       `
@@ -140,9 +150,15 @@ export class PostResolver {
         'email', u.email,
         'createdAt', u."createdAt",
         'updatedAt', u."updatedAt"
-        ) creator FROM post p
+        ) creator,
+        ${
+          req.session.userId
+            ? '(SELECT value FROM updoot WHERE "userId" = $2 and "postId" = p.id) "voteStatus"'
+            : 'null as "voteStatus"'
+        }
+         FROM post p
       INNER JOIN public.user u ON u.id = p."creatorId"
-      ${cursor ? `WHERE p."createdAt"' < $2` : ""}
+      ${cursor ? `WHERE p."createdAt" < $${cursorIdx}` : ""}
       ORDER BY p."createdAt" DESC
       LIMIT $1
     `,
