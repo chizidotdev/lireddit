@@ -3,18 +3,16 @@ import {
   Button,
   Flex,
   Heading,
-  IconButton,
+  Link,
   Stack,
   Text,
 } from "@chakra-ui/react";
 import { withUrqlClient } from "next-urql";
 import { usePostsQuery } from "../generated/graphql";
 import { createUrqlClient } from "../utils/createUrqlClient";
-import { useMeQuery } from "../generated/graphql";
 import { Layout } from "../components/Layout";
-import Link from "next/link";
+import NextLink from "next/link";
 import { useState } from "react";
-import { ChevronDownIcon, ChevronUpIcon } from "@chakra-ui/icons";
 import { UpdootSection } from "../components/UpdootSection";
 
 const Index = () => {
@@ -32,8 +30,10 @@ const Index = () => {
 
   return (
     <Layout>
-      <Button variant="link">
-        <Link href="/create-post">Create Post</Link>
+      <Button variant="NextLink">
+        <Button mb={10}>
+          <NextLink href="/create-post">Create Post</NextLink>
+        </Button>
       </Button>
       <br />
       {data && !fetching ? (
@@ -42,7 +42,11 @@ const Index = () => {
             <Flex key={idx} p={5} shadow="md" borderWidth="1px">
               <UpdootSection post={p} />
               <Box>
-                <Heading fontSize="xl">{p.title}</Heading>
+                <NextLink href="/post/[id]" as={`/post/${p.id}`}>
+                  <Link>
+                    <Heading fontSize="xl">{p.title}</Heading>
+                  </Link>
+                </NextLink>
                 <Text mt={4}>posted by: {p.creator.username}</Text>
                 <Text mt={4}>{p.textSnippet}</Text>
               </Box>

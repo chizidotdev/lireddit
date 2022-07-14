@@ -126,7 +126,7 @@ let PostResolver = class PostResolver {
         };
     }
     post(id) {
-        return Post_1.Post.findOne(id);
+        return Post_1.Post.findOne({ where: { id }, relations: ["creator"] });
     }
     async createPost(input, { req }) {
         return Post_1.Post.create(Object.assign(Object.assign({}, input), { creatorId: req.session.userId })).save();
