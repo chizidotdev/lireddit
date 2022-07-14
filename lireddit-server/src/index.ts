@@ -13,6 +13,8 @@ const Redis = require("ioredis");
 import connectRedis from "connect-redis";
 import { MyContext } from "./types";
 import conn from "./utils/app-data-source";
+import { createUserLoader } from "./utils/createUserLoader";
+import { createUpdootLoader } from "./utils/createUpdootLoader";
 // import { Post } from "./entities/Post";
 
 let RedisStore = connectRedis(session);
@@ -62,7 +64,13 @@ const main = async () => {
       resolvers: [UserResolver, PostResolver],
       validate: false,
     }),
-    context: ({ req, res }): MyContext => ({ req, res, redis }),
+    context: ({ req, res }): MyContext => ({
+      req,
+      res,
+      redis,
+      userLoader: createUserLoader(),
+      updootLoader: createUpdootLoader(),
+    }),
   });
 
   await apolloServer.start();

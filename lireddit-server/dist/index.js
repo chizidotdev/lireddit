@@ -15,6 +15,8 @@ const express_session_1 = __importDefault(require("express-session"));
 const Redis = require("ioredis");
 const connect_redis_1 = __importDefault(require("connect-redis"));
 const app_data_source_1 = __importDefault(require("./utils/app-data-source"));
+const createUserLoader_1 = require("./utils/createUserLoader");
+const createUpdootLoader_1 = require("./utils/createUpdootLoader");
 let RedisStore = (0, connect_redis_1.default)(express_session_1.default);
 const main = async () => {
     await app_data_source_1.default
@@ -49,7 +51,13 @@ const main = async () => {
             resolvers: [user_1.UserResolver, post_1.PostResolver],
             validate: false,
         }),
-        context: ({ req, res }) => ({ req, res, redis }),
+        context: ({ req, res }) => ({
+            req,
+            res,
+            redis,
+            userLoader: (0, createUserLoader_1.createUserLoader)(),
+            updootLoader: (0, createUpdootLoader_1.createUpdootLoader)(),
+        }),
     });
     await apolloServer.start();
     apolloServer.applyMiddleware({
