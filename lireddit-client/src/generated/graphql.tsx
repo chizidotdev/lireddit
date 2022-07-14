@@ -69,7 +69,8 @@ export type MutationRegisterArgs = {
 
 export type MutationUpdatePostArgs = {
   id: Scalars['Float'];
-  title?: InputMaybe<Scalars['String']>;
+  text: Scalars['String'];
+  title: Scalars['String'];
 };
 
 
@@ -205,6 +206,15 @@ export type RegisterMutationVariables = Exact<{
 
 
 export type RegisterMutation = { __typename?: 'Mutation', register: { __typename?: 'UserResponse', user?: { __typename?: 'User', id: number, username: string } | null, errors?: Array<{ __typename?: 'FieldError', field: string, message: string }> | null } };
+
+export type UpdatePostMutationVariables = Exact<{
+  text: Scalars['String'];
+  title: Scalars['String'];
+  id: Scalars['Float'];
+}>;
+
+
+export type UpdatePostMutation = { __typename?: 'Mutation', updatePost?: { __typename?: 'Post', id: number, title: string, text: string, textSnippet: string, createdAt: string, updatedAt: string } | null };
 
 export type MeQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -355,6 +365,22 @@ ${RegularErrorFragmentDoc}`;
 
 export function useRegisterMutation() {
   return Urql.useMutation<RegisterMutation, RegisterMutationVariables>(RegisterDocument);
+};
+export const UpdatePostDocument = gql`
+    mutation UpdatePost($text: String!, $title: String!, $id: Float!) {
+  updatePost(text: $text, title: $title, id: $id) {
+    id
+    title
+    text
+    textSnippet
+    createdAt
+    updatedAt
+  }
+}
+    `;
+
+export function useUpdatePostMutation() {
+  return Urql.useMutation<UpdatePostMutation, UpdatePostMutationVariables>(UpdatePostDocument);
 };
 export const MeDocument = gql`
     query Me {

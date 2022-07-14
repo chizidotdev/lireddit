@@ -45,7 +45,7 @@ const Navbar: React.FC<NavbarProps> = ({}) => {
       top={0}
       bg="blue.900"
       p={4}
-      px={100}
+      px="10vw"
       color="white"
     >
       <Link href="/">Lireddit</Link>
